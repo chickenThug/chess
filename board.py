@@ -4,9 +4,10 @@ class Board:
 
     def generate_starting_board(self):
         board = [[0 for i in range(8)] for j in range(8)]
+        # Place pawns where 1 corresponds to white pawn and 7 to black pawn
         for k in range(8):
-            board[1][k] = 1
-            board[6][k] = 7
+            board[k][1] = 7
+            board[k][6] = 1
         return board
 
     def place_piece(self, piece, coordinate):
