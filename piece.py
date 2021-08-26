@@ -1,19 +1,19 @@
 class Piece:
-    def __init__(self, color, piece):
+    def __init__(self, color, type):
         self.color = color
-        self.piece = piece
+        self.type = type
 
     def get_piece(self):
-        return self.piece
+        return self.type
 
     def get_color(self):
         return self.color
 
     def __str__(self):
-        if self.piece == 'Empty':
+        if self.type == 'Empty':
             return 'nE'
         c = 'w' if self.color else 'b'
-        p = 'N' if self.piece == 'Knight' else self.piece[0]
+        p = 'N' if self.type == 'Knight' else self.type[0]
         return c + p
 
 

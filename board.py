@@ -1,5 +1,6 @@
 from piece import Piece
 
+
 class Board:
     def __init__(self):
         self.board = self.generate_starting_board()
@@ -26,6 +27,3 @@ class Board:
             print()
             for j in range(8):
                 print(self.board[j][i], end=' ')
-
-b = Board()
-b.print_board()
