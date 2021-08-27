@@ -10,7 +10,7 @@ def generate_moves(board, color):
             type = piece.get_type()
             piece_color = piece.get_color()
             if type == 'Pawn' and color == piece_color:
-                moves += generate_pawn_moves(board, color, (i, j))
+                moves += generate_pawn_moves(board, (i, j))
             elif type == 'Knight' and color == piece_color:
                 moves += generate_knight_moves(board, (i, j))
             elif type == 'Bishop' and color == piece_color:
@@ -24,8 +24,51 @@ def generate_moves(board, color):
     return moves
 
 
-def generate_pawn_moves(board, color, coordinate):
-    return []
+def generate_pawn_moves(board, coordinate):
+    moves = []
+    color = board.get_piece(coordinate).get_color()
+    dir = -1 if color else 1
+    start_row = 6 if color else 1
+    next_to_last_row = 1 if color else 6
+    promotion = True if next_to_last_row == coordinate[1] else False
+
+    piece_one_square_ahead = board.get_piece((coordinate[0], coordinate[1] + dir)).get_type()
+    if piece_one_square_ahead == 'Empty':
+        if promotion:
+            for p in 'NBRQ':
+                notation = 'abcdefgh'[coordinate[0]] + '87654321'[coordinate[1] + dir] + '=' + p
+                moves.append(notation)
+        else:
+            notation = 'abcdefgh'[coordinate[0]] + '87654321'[coordinate[1] + dir]
+            moves.append(notation)
+        if start_row == coordinate[1]:
+            piece_two_squares_ahead = board.get_piece((coordinate[0], coordinate[1] + 2 * dir)).get_type()
+            if piece_two_squares_ahead == 'Empty':
+                notation = 'abcdefgh'[coordinate[0]] + '87654321'[coordinate[1] + 2 * dir]
+                moves.append(notation)
+
+    if coordinate[0] > 0:
+        piece = board.get_piece((coordinate[0]-1, coordinate[1]+dir))
+        if not piece.get_type() == 'Empty' and not piece.get_color() == color:
+            if promotion:
+                for p in 'NBRQ':
+                    notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0]-1] + '87654321'[coordinate[1] + dir] + '=' + p
+                    moves.append(notation)
+            else:
+                notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0] - 1] + '87654321'[coordinate[1] + dir]
+                moves.append(notation)
+
+    if coordinate[0] < 7:
+        piece = board.get_piece((coordinate[0]+1, coordinate[1]+dir))
+        if not piece.get_type() == 'Empty' and not piece.get_color() == color:
+            if promotion:
+                for p in 'NBRQ':
+                    notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0]+1] + '87654321'[coordinate[1]+dir] + '=' + p
+                    moves.append(notation)
+            else:
+                notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0]+1] + '87654321'[coordinate[1]+dir]
+                moves.append(notation)
+    return moves
 
 
 def generate_knight_moves(board, coordinate):

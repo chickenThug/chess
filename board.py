@@ -44,6 +44,9 @@ class Board:
         y = coordinate[1]
         return self.board[x][y]
 
+    def make_move(self, move):
+        old_coordinate = move[0]
+        new_coordinate = move[1]
     def print_board(self):
         for i in range(8):
             print()
