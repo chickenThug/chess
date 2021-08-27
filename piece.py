@@ -3,7 +3,7 @@ class Piece:
         self.color = color
         self.type = type
 
-    def get_piece(self):
+    def get_type(self):
         return self.type
 
     def get_color(self):
