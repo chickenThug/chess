@@ -5,8 +5,10 @@ import re
 
 
 def generate_moves(board, color):
-    moves = naive_move_generation(board, color)
-    return remove_illegal_moves(board, moves, not color)
+    naive_moves = naive_move_generation(board, color)
+    legal_moves = remove_illegal_moves(board, naive_moves, not color)
+    unambiguous_moves = remove_ambiguity_from_moves(legal_moves)
+    return unambiguous_moves
 
 
 # Naivly generates moves without concern for if the move will result in check or if notation is ambiguous
@@ -180,3 +182,34 @@ def remove_illegal_moves(board, moves, turn):
     for ill_move in ill_moves:
         moves.remove(ill_move)
     return moves
+
+
+def remove_ambiguity_from_moves(moves):
+    unambiguous_moves = []
+    for move in moves:
+        exist, index = notation_present(move, unambiguous_moves)
+        if exist:
+            # File differ
+            if not unambiguous_moves[index][0][0] == move[0][0]:
+                unambiguous_moves[index][1] = unambiguous_moves[index][1][:1] + \
+                                            'abcdefgh'[unambiguous_moves[index][0][0]] + unambiguous_moves[index][1][1:]
+                move[1] = move[1][:1] + 'abcdefgh'[move[0][0]] + move[1][1:]
+                unambiguous_moves.append(move)
+            # Same file different rank
+            else:
+                unambiguous_moves[index][1] = unambiguous_moves[index][1][:1] + \
+                                            'abcdefgh'[unambiguous_moves[index][0][1]] + unambiguous_moves[index][1][1:]
+                move[1] = move[1][:1] + 'abcdefgh'[move[0][1]] + move[1][1:]
+                unambiguous_moves.append(move)
+                unambiguous_moves.append(move)
+        else:
+            unambiguous_moves.append(move)
+    return unambiguous_moves
+
+
+def notation_present(move, moves):
+    for i in range(len(moves)):
+        if move[1] == moves[i][1]:
+            return True, i
+    return False, 'Egg'
+

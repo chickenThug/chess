@@ -11,7 +11,7 @@ class Piece:
 
     def __str__(self):
         if self.type == 'Empty':
-            return 'nE'
+            return '  '
         c = 'w' if self.color else 'b'
         p = 'N' if self.type == 'Knight' else self.type[0]
         return c + p

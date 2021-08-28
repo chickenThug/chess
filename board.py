@@ -55,7 +55,9 @@ class Board:
         self.place_piece(Piece(True, 'Empty'), old_coordinate)
 
     def print_board(self):
+        print('-----------------------------------------')
         for i in range(8):
-            print()
             for j in range(8):
-                print(self.board[j][i], end=' ')
+                print('|', self.board[j][i], end=' ')
+            print('|')
+            print('-----------------------------------------')
