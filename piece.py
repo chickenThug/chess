@@ -15,5 +15,3 @@ class Piece:
         c = 'w' if self.color else 'b'
         p = 'N' if self.type == 'Knight' else self.type[0]
         return c + p
-
-

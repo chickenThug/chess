@@ -1,4 +1,5 @@
 from piece import Piece
+import re
 
 
 class Board:
@@ -46,7 +47,13 @@ class Board:
 
     def make_move(self, move):
         old_coordinate = move[0]
-        new_coordinate = move[1]
+        x = re.search(".*[a-h][1-8]", move[1])
+        m = x.group()
+        new_coordinate = (ord(m[-2])-97, 8-int(m[-1]))
+        piece = self.get_piece((old_coordinate[0], old_coordinate[1]))
+        self.place_piece(piece, new_coordinate)
+        self.place_piece(Piece(True, 'Empty'), old_coordinate)
+
     def print_board(self):
         for i in range(8):
             print()
