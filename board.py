@@ -6,7 +6,12 @@ class Board:
     def __init__(self):
         self.board = self.generate_starting_board()
         self.en_passant = 0
-        self.castling_states = 0
+
+        # The first bit regulates weather the white king has moved the second weather the black king has moved.
+        # The third weather the white queen rook has moved the fourth weather the black queen rook has moved
+        # The fifth weather the white king rook has moved and the sixth weather the black king rook has moved
+        # Where zero is false and 1 is true
+        self.castling_state = 0
 
     def generate_starting_board(self):
         board = [[Piece(True, 'Empty') for i in range(8)] for j in range(8)]
@@ -60,11 +65,25 @@ class Board:
         else:
             self.en_passant = 0
         # Handling en_passant captures
-        if target_square.get_type() == 'Empty' and not re.search('x', move[1]) is None:
+        if target_square.get_type() == 'Empty' and 'x' in move[1]:
             color = moving_piece.get_color()
             dir = 1 if color else -1
             self.place_piece(Piece(True, 'Empty'), (new_coordinate[0], new_coordinate[1]+dir))
 
+        # update castling_states
+        if old_coordinate == (4, 7):
+            self.castling_state = self.castling_state | 1
+        elif old_coordinate == (4, 0):
+            self.castling_state = self.castling_state | 2
+        elif old_coordinate == (0, 7):
+            self.castling_state = self.castling_state | 4
+        elif old_coordinate == (0, 0):
+            self.castling_state = self.castling_state | 8
+        elif old_coordinate == (7, 7):
+            self.castling_state = self.castling_state | 16
+        elif old_coordinate == (7, 0):
+            self.castling_state = self.castling_state | 32
+        
         self.place_piece(moving_piece, new_coordinate)
         self.place_piece(Piece(True, 'Empty'), old_coordinate)
 
