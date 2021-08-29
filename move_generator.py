@@ -43,6 +43,7 @@ def generate_pawn_moves(board, coordinate):
     promotion = True if next_to_last_row == coordinate[1] else False
 
     piece_one_square_ahead = board.get_piece((coordinate[0], coordinate[1] + dir)).get_type()
+    # One step forward move
     if piece_one_square_ahead == 'Empty':
         if promotion:
             for p in 'NBRQ':
@@ -51,12 +52,13 @@ def generate_pawn_moves(board, coordinate):
         else:
             notation = 'abcdefgh'[coordinate[0]] + '87654321'[coordinate[1] + dir]
             moves.append([coordinate, notation])
+        # Two step forward move
         if start_row == coordinate[1]:
             piece_two_squares_ahead = board.get_piece((coordinate[0], coordinate[1] + 2 * dir)).get_type()
             if piece_two_squares_ahead == 'Empty':
                 notation = 'abcdefgh'[coordinate[0]] + '87654321'[coordinate[1] + 2 * dir]
                 moves.append([coordinate, notation])
-
+    # Captures to the left for white and right for black
     if coordinate[0] > 0:
         piece = board.get_piece((coordinate[0]-1, coordinate[1]+dir))
         if not piece.get_type() == 'Empty' and not piece.get_color() == color:
@@ -68,6 +70,7 @@ def generate_pawn_moves(board, coordinate):
                 notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0] - 1] + '87654321'[coordinate[1] + dir]
                 moves.append([coordinate, notation])
 
+    # Captures to the right for white and left for black
     if coordinate[0] < 7:
         piece = board.get_piece((coordinate[0]+1, coordinate[1]+dir))
         if not piece.get_type() == 'Empty' and not piece.get_color() == color:
@@ -78,6 +81,13 @@ def generate_pawn_moves(board, coordinate):
             else:
                 notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[coordinate[0]+1] + '87654321'[coordinate[1]+dir]
                 moves.append([coordinate, notation])
+
+    # En passant
+    en_passant = board.get_en_passant()
+    if en_passant > 0 and 0.5*dir+3.5 == coordinate[1] and (en_passant == coordinate[0] or en_passant == coordinate[0]+2):
+        notation = 'abcdefgh'[coordinate[0]] + 'x' + 'abcdefgh'[en_passant-1] + str(int(-1.5*dir+4.5))
+        moves.append([coordinate, notation])
+
     return moves
 
 
