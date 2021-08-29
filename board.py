@@ -54,23 +54,9 @@ class Board:
 
     def make_move(self, move):
         old_coordinate = move[0]
-        x = re.search(".*[a-h][1-8]", move[1])
-        m = x.group()
-        new_coordinate = (ord(m[-2])-97, 8-int(m[-1]))
         moving_piece = self.get_piece(old_coordinate)
-        target_square = self.get_piece(new_coordinate)
-        # Update en_passant state
-        if moving_piece.get_type() == 'Pawn' and abs(old_coordinate[1]-new_coordinate[1]) == 2:
-            self.en_passant = ord(move[1][0])-96
-        else:
-            self.en_passant = 0
-        # Handling en_passant captures
-        if target_square.get_type() == 'Empty' and 'x' in move[1]:
-            color = moving_piece.get_color()
-            dir = 1 if color else -1
-            self.place_piece(Piece(True, 'Empty'), (new_coordinate[0], new_coordinate[1]+dir))
-
-        # update castling_states
+        color = moving_piece.get_color()
+        # Update castling states
         if old_coordinate == (4, 7):
             self.castling_state = self.castling_state | 1
         elif old_coordinate == (4, 0):
@@ -83,12 +69,40 @@ class Board:
             self.castling_state = self.castling_state | 16
         elif old_coordinate == (7, 0):
             self.castling_state = self.castling_state | 32
-        
-        self.place_piece(moving_piece, new_coordinate)
-        self.place_piece(Piece(True, 'Empty'), old_coordinate)
+
+        if move[1] == 'O-O-O':
+            self.place_piece(Piece(True, 'Empty'), old_coordinate)
+            self.place_piece(Piece(True, 'Empty'), (0, old_coordinate[1]))
+            self.place_piece(Piece(color, 'Rook'), (3, old_coordinate[1]))
+            self.place_piece(Piece(color, 'King'), (2, old_coordinate[1]))
+        elif move[1] == 'O-O':
+            self.place_piece(Piece(True, 'Empty'), old_coordinate)
+            self.place_piece(Piece(True, 'Empty'), (7, old_coordinate[1]))
+            self.place_piece(Piece(color, 'Rook'), (5, old_coordinate[1]))
+            self.place_piece(Piece(color, 'King'), (6, old_coordinate[1]))
+        else:
+            x = re.search(".*[a-h][1-8]", move[1])
+            m = x.group()
+            new_coordinate = (ord(m[-2])-97, 8-int(m[-1]))
+            target_square = self.get_piece(new_coordinate)
+            # Update en_passant state
+            if moving_piece.get_type() == 'Pawn' and abs(old_coordinate[1]-new_coordinate[1]) == 2:
+                self.en_passant = ord(move[1][0])-96
+            else:
+                self.en_passant = 0
+            # Handling en_passant captures
+            if target_square.get_type() == 'Empty' and 'x' in move[1]:
+                dir = 1 if color else -1
+                self.place_piece(Piece(True, 'Empty'), (new_coordinate[0], new_coordinate[1]+dir))
+
+            self.place_piece(moving_piece, new_coordinate)
+            self.place_piece(Piece(True, 'Empty'), old_coordinate)
 
     def get_en_passant(self):
         return self.en_passant
+
+    def get_castling_states(self):
+        return self.castling_state
 
     def print_board(self):
         print('-----------------------------------------')

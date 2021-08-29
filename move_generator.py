@@ -127,6 +127,7 @@ def generate_queen_moves(board, coordinate):
 def generate_king_moves(board, coordinate):
     moves = []
     color = board.get_piece(coordinate).get_color()
+    # 'Normal'  moves
     for i in range(3):
         for j in range(3):
             x = coordinate[0] + i - 1
@@ -139,6 +140,17 @@ def generate_king_moves(board, coordinate):
                 elif not piece.get_color() == color:
                     notation = 'Kx' + 'abcdefgh'[x] + '87654321'[y]
                     moves.append([coordinate, notation])
+    # Castling moves
+    castle_state = board.get_castling_states()
+    offset = 0 if color else 1
+    backrow = 7 if color else 0
+    if castle_state & 2**offset == 2**offset and castle_state & 2**(offset+2) == 2**(offset+2):
+        if board.get_piece((1, backrow)).get_type() == 'Empty' and board.get_piece((2, backrow)).get_type() == 'Empty' \
+                and board.get_piece((3, backrow)).get_type() == 'Empty':
+            notation = 'O-O-O'
+    if castle_state & 2**offset == 2**offset and castle_state & 2**(offset+4) == 2**(offset+4):
+        if board.get_piece((5, backrow)).get_type() == 'Empty' and board.get_piece((6, backrow)).get_type() == 'Empty':
+            notation = 'O-O'
     return moves
 
 
