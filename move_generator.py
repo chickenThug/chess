@@ -133,7 +133,7 @@ def generate_king_moves(board, coordinate):
             x = coordinate[0] + i - 1
             y = coordinate[1] + j - 1
             if in_bounds(x, y):
-                piece = board.get_piece((x,y))
+                piece = board.get_piece((x, y))
                 if piece.get_type() == 'Empty':
                     notation = 'K' + 'abcdefgh'[x] + '87654321'[y]
                     moves.append([coordinate, notation])
@@ -148,9 +148,11 @@ def generate_king_moves(board, coordinate):
         if board.get_piece((1, backrow)).get_type() == 'Empty' and board.get_piece((2, backrow)).get_type() == 'Empty' \
                 and board.get_piece((3, backrow)).get_type() == 'Empty':
             notation = 'O-O-O'
-    if castle_state & 2**offset == 2**offset and castle_state & 2**(offset+4) == 2**(offset+4):
+            moves.append([coordinate, notation])
+    if not castle_state & 2**offset == 2**offset and not castle_state & 2**(offset+4) == 2**(offset+4):
         if board.get_piece((5, backrow)).get_type() == 'Empty' and board.get_piece((6, backrow)).get_type() == 'Empty':
             notation = 'O-O'
+            moves.append([coordinate, notation])
     return moves
 
 
@@ -186,7 +188,6 @@ def remove_illegal_moves(board, moves, turn):
     for move in moves:
         board_copy = copy.deepcopy(board)
         board_copy.make_move(move)
-        opp_moves = naive_move_generation(board_copy, turn)
         coordinate_of_king = (0, 0)
         for i in range(8):
             for j in range(8):
@@ -194,16 +195,34 @@ def remove_illegal_moves(board, moves, turn):
                 if not piece.get_color() == turn and piece.get_type() == 'King':
                     coordinate_of_king = (i, j)
                     break
-        for opp_move in opp_moves:
+        if in_check(coordinate_of_king, board_copy, turn):
+            ill_moves.append(move)
+            continue
+        if move[1] == 'O-O':
+            y = 0 if turn else 7
+            coordinate_of_rook = (5, y)
+            if in_check(coordinate_of_rook, board_copy, turn):
+                ill_moves.append(move)
+        elif move[1] == 'O-O-O':
+            y = 0 if turn else 7
+            coordinate_of_rook = (3, y)
+            if in_check(coordinate_of_rook, board_copy, turn):
+                ill_moves.append(move)
+    for ill_move in ill_moves:
+        moves.remove(ill_move)
+    return moves
+
+
+def in_check(coordinate_of_king, board, turn):
+    opp_moves = naive_move_generation(board, turn)
+    for opp_move in opp_moves:
+        if not opp_move[1] == 'O-O' and not opp_move[1] == 'O-O-O':
             x = re.search(".*[a-h][1-8]", opp_move[1])
             m = x.group()
             dest_square = (ord(m[-2]) - 97, 8 - int(m[-1]))
             if coordinate_of_king == dest_square:
-                ill_moves.append(move)
-                break
-    for ill_move in ill_moves:
-        moves.remove(ill_move)
-    return moves
+                return True
+    return False
 
 
 def remove_ambiguity_from_moves(moves):

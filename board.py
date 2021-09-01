@@ -70,6 +70,8 @@ class Board:
         elif old_coordinate == (7, 0):
             self.castling_state = self.castling_state | 32
 
+        self.en_passant = 0
+
         if move[1] == 'O-O-O':
             self.place_piece(Piece(True, 'Empty'), old_coordinate)
             self.place_piece(Piece(True, 'Empty'), (0, old_coordinate[1]))
@@ -88,8 +90,6 @@ class Board:
             # Update en_passant state
             if moving_piece.get_type() == 'Pawn' and abs(old_coordinate[1]-new_coordinate[1]) == 2:
                 self.en_passant = ord(move[1][0])-96
-            else:
-                self.en_passant = 0
             # Handling en_passant captures
             if target_square.get_type() == 'Empty' and 'x' in move[1]:
                 dir = 1 if color else -1
